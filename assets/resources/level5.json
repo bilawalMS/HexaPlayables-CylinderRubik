@@ -1,0 +1,192 @@
+{
+  "target": 100,
+  "hexes": [
+    {
+      "row": 0,
+      "column": 3,
+      "numbers": [2,2,1,2,2]
+    },
+    {
+      "row": 0,
+      "column": 4,
+      "numbers": [2,2,2,1,4,4]
+    },
+    {
+      "row": 0,
+      "column": 5,
+      "numbers": [2,3,3]
+    },
+    {
+      "row": 1,
+      "column": 1,
+      "numbers": [4,4,1,1,1,1]
+    },
+    {
+      "row": 1,
+      "column": 2,
+      "numbers": [4,4,4,1,3,3]
+    },
+    {
+      "row": 1,
+      "column": 3,
+      "numbers": []
+    },
+    {
+      "row": 1,
+      "column": 4,
+      "numbers": []
+    },
+    {
+      "row": 1,
+      "column": 5,
+      "numbers": []
+    },
+    {
+      "row": 1,
+      "column": 6,
+      "numbers": [4,4,4,4]
+    },
+    {
+      "row": 1,
+      "column": 7,
+      "numbers": [2,1,2,2,2,2]
+    },
+    {
+      "row": 2,
+      "column": 1,
+      "numbers": [1,3]
+    },
+    {
+      "row": 2,
+      "column": 2,
+      "numbers": [4,4,4,4]
+    },
+    {
+      "row": 2,
+      "column": 3,
+      "numbers": []
+    },
+    {
+      "row": 2,
+      "column": 4,
+      "numbers": []
+    },
+    {
+      "row": 2,
+      "column": 5,
+      "numbers": []
+    },
+    {
+      "row": 2,
+      "column": 6,
+      "numbers": [2,1,3,3,3]
+    },
+    {
+      "row": 2,
+      "column": 7,
+      "numbers": [1,1,1,1,1,4,1,1]
+    },
+    {
+      "row": 3,
+      "column": 1,
+      "numbers": [4,4,4]
+    },
+    {
+      "row": 3,
+      "column": 2,
+      "numbers": []
+    },
+    {
+      "row": 3,
+      "column": 3,
+      "numbers": [4,4,4,3,3,3]
+    },
+    {
+      "row": 3,
+      "column": 4,
+      "numbers": []
+    },
+    {
+      "row": 3,
+      "column": 5,
+      "numbers": [2,2,2,2,2]
+    },
+    {
+      "row": 3,
+      "column": 6,
+      "numbers": []
+    },
+    {
+      "row": 3,
+      "column": 7,
+      "numbers": [3,3,3]
+    },
+    {
+      "row": 4,
+      "column": 1,
+      "numbers": [3,3,3,2,2]
+    },
+    {
+      "row": 4,
+      "column": 2,
+      "numbers": [1,1,1,1,2,2,2,1,1,1]
+    },
+    {
+      "row": 4,
+      "column": 3,
+      "numbers": [4,4,4,2,2,2]
+    },
+    {
+      "row": 4,
+      "column": 4,
+      "numbers": []
+    },
+    {
+      "row": 4,
+      "column": 5,
+      "numbers": [4,4,4,4]
+    },
+    {
+      "row": 4,
+      "column": 6,
+      "numbers": [3,3,1,1,1,1,1]
+    },
+    {
+      "row": 4,
+      "column": 7,
+      "numbers": [2,2,4,4,4]
+    },
+    
+    {
+      "row": 5,
+      "column": 2,
+      "numbers": [4,4,3,3]
+    },
+    {
+      "row": 5,
+      "column": 3,
+      "numbers": [1,4,4,4,4]
+    },
+    {
+      "row": 5,
+      "column": 4,
+      "numbers": [4,4,4,4,3,3,3]
+    },
+    {
+      "row": 5,
+      "column": 5,
+      "numbers": [1,1,1,1,1,1]
+    },
+    {
+      "row": 5,
+      "column": 6,
+      "numbers": [2,3]
+    },
+    {
+      "row": 6,
+      "column": 4,
+      "numbers": [1,2,1,2]
+    }
+    
+  ]
+}

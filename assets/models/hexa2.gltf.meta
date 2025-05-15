@@ -1,0 +1,78 @@
+{
+  "ver": "2.3.13",
+  "importer": "gltf",
+  "imported": true,
+  "uuid": "668f789a-256b-41d0-be9b-53280de6a756",
+  "files": [],
+  "subMetas": {
+    "e2349": {
+      "importer": "gltf-mesh",
+      "uuid": "668f789a-256b-41d0-be9b-53280de6a756@e2349",
+      "displayName": "",
+      "id": "e2349",
+      "name": "Mesh.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 452
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "7e27d": {
+      "importer": "gltf-scene",
+      "uuid": "668f789a-256b-41d0-be9b-53280de6a756@7e27d",
+      "displayName": "",
+      "id": "7e27d",
+      "name": "hexa2.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "668f789a-256b-41d0-be9b-53280de6a756@e2349"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [],
+      "scenes": [
+        "668f789a-256b-41d0-be9b-53280de6a756@7e27d"
+      ]
+    },
+    "mountAllAnimationsOnPrefab": false,
+    "normals": 2,
+    "tangents": 3
+  }
+}

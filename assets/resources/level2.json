@@ -1,0 +1,114 @@
+{
+  "target": 200,
+  "hexes": [
+    {
+      "row": 0,
+      "column": 2,
+      "numbers": []
+    },
+    {
+      "row": 0,
+      "column": 0,
+      "numbers": []
+    },
+    {
+      "row": 0,
+      "column": 4,
+      "numbers": []
+    },
+
+    {
+      "row": 1,
+      "column": 0,
+      "numbers": []
+    },
+    {
+      "row": 1,
+      "column": 1,
+      "numbers": [ 1, 1, 2, 2 ]
+    },
+    {
+      "row": 1,
+      "column": 2,
+      "numbers": []
+    },
+    {
+      "row": 1,
+      "column": 3,
+      "numbers": [ 2, 2, 3, 3 ]
+    },
+    {
+      "row": 1,
+      "column": 4,
+      "numbers": []
+    },
+
+    {
+      "row": 2,
+      "column": 0,
+      "numbers": []
+    },
+    {
+      "row": 2,
+      "column": 1,
+      "numbers": []
+    },
+    {
+      "row": 2,
+      "column": 2,
+      "numbers": []
+    },
+    {
+      "row": 2,
+      "column": 3,
+      "numbers": []
+    },
+    {
+      "row": 2,
+      "column": 4,
+      "numbers": []
+    },
+
+    {
+      "row": 3,
+      "column": 0,
+      "numbers": []
+    },
+    {
+      "row": 3,
+      "column": 1,
+      "numbers": []
+    },
+    {
+      "row": 3,
+      "column": 2,
+      "numbers": [ 3, 3, 1 ]
+    },
+    {
+      "row": 3,
+      "column": 3,
+      "numbers": []
+    },
+    {
+      "row": 3,
+      "column": 4,
+      "numbers": []
+    },
+
+    {
+      "row": 0,
+      "column": 1,
+      "numbers": []
+    },
+    {
+      "row": 4,
+      "column": 2,
+      "numbers": []
+    },
+    {
+      "row": 0,
+      "column": 3,
+      "numbers": []
+    }
+  ]
+}

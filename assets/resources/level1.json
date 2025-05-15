@@ -1,0 +1,114 @@
+{
+  "target": 300,
+  "hexes": [
+
+    {
+      "row": 0,
+      "column": 0,
+      "numbers": [1,1,1,1,1,1,1]
+    },
+    {
+      "row": 0,
+      "column": 1,
+      "numbers": [4,4,4,4,4,4]
+    },
+    {
+      "row": 0,
+      "column": 2,
+      "numbers": [2,2,2,2,2,2]
+    },
+    {
+      "row": 0,
+      "column": 3,
+      "numbers": [4,4,4,4,4,4]
+    },
+    {
+      "row": 0,
+      "column": 4,
+      "numbers": [1,1,1,1,1,1,1]
+    },
+
+    {
+      "row": 1,
+      "column": 0,
+      "numbers": [3,3,3,3,3,3]
+    },
+    {
+      "row": 1,
+      "column": 1,
+      "numbers": [2,2,2,2,2,2]
+    },
+    {
+      "row": 1,
+      "column": 2,
+      "numbers": [3,3,3,3,3,3,3]
+    },
+    {
+      "row": 1,
+      "column": 3,
+      "numbers": [2,2,2,2,2]
+    },
+    {
+      "row": 1,
+      "column": 4,
+      "numbers": [3,3,3,3,3,3]
+    },
+
+    {
+      "row": 2,
+      "column": 0,
+      "numbers": [1,1,1,1,1,1,1]
+    },
+    {
+      "row": 2,
+      "column": 1,
+      "numbers": [4,4,4,4,4,4,4]
+    },
+    {
+      "row": 2,
+      "column": 2,
+      "numbers": [1,1,1,1,1,1]
+    },
+    {
+      "row": 2,
+      "column": 3,
+      "numbers": [4,4,4,4,4,4]
+    },
+    {
+      "row": 2,
+      "column": 4,
+      "numbers": [1,1,1,1,1,1,1]
+    },
+
+    {
+      "row": 3,
+      "column": 0,
+      "numbers": [3,3,3,3,3,3]
+    },
+    {
+      "row": 3,
+      "column": 1,
+      "numbers": [1,1,1,1,1,1]
+    },
+    {
+      "row": 3,
+      "column": 2,
+      "numbers": [3,3,3,3,3,3]
+    },
+    {
+      "row": 3,
+      "column": 3,
+      "numbers": [2,2,2,2,2,2]
+    },
+    {
+      "row": 3,
+      "column": 4,
+      "numbers": [3,3,3,3,3,3,3]
+    },
+    {
+      "row": 4,
+      "column": 2,
+      "numbers": []
+    }
+  ]
+}
