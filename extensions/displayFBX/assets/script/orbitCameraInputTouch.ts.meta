@@ -1,0 +1,13 @@
+{
+  "ver": "4.0.21",
+  "importer": "typescript",
+  "imported": true,
+  "uuid": "21a352ea-c195-42d4-aec3-66c92f461b8a",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "importAsPlugin": false,
+    "importerSettings": 7,
+    "moduleId": "project:///assets/script/fight/orbitCameraInputTouch.js"
+  }
+}

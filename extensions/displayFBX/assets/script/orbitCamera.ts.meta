@@ -1,0 +1,13 @@
+{
+  "ver": "4.0.21",
+  "importer": "typescript",
+  "imported": true,
+  "uuid": "f117354d-68f5-47c4-8d43-b293b9cccc3e",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "importAsPlugin": false,
+    "importerSettings": 7,
+    "moduleId": "project:///assets/script/fight/orbitCamera.js"
+  }
+}

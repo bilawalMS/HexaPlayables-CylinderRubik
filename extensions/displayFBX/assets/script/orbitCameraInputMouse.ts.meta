@@ -1,0 +1,13 @@
+{
+  "ver": "4.0.21",
+  "importer": "typescript",
+  "imported": true,
+  "uuid": "27c05368-3278-4408-b87c-9e0801fe9255",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "importAsPlugin": false,
+    "importerSettings": 7,
+    "moduleId": "project:///assets/script/fight/orbitCameraInputMouse.js"
+  }
+}
