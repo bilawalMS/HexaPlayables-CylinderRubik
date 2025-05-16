@@ -1,0 +1,151 @@
+#text {
+    color: var(--color-normal-contrast-weakest);
+    margin: auto;
+    width: 180px;
+}
+.counter {
+    text-align: center;
+}
+.container {
+    width: 100%;
+    margin-top: 10px;
+    padding-right: 5px;
+    position: relative;
+    float: left;
+}
+.edit-canvas {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: black;
+    width: 100%;
+    height: 300px;
+}
+.editor-top-left-title {
+    color: rgba(200, 200, 200, 0.5);
+    font-size: 0.9em;
+    line-height: 1.2em;
+    margin: 0;
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    pointer-events: none;
+}
+
+.editor-bottom-icons {
+    position: absolute;
+    bottom: 5px;
+    left: 5px;
+    pointer-events: none;
+}
+
+.edit-bottom-icon {
+    width: 40px;
+    height: 40px;
+    margin-left: 5px;
+    border: solid 1px rgba(200, 200, 200, 0.5);
+}
+
+.float-window {
+    width: 100%;
+    height: 40px;
+    bottom: 10px;
+    right: 10px;
+    opacity: 1;
+    background: var(--color-normal-fill);
+    border-radius: calc(var(--size-normal-radius));
+    float: left;
+}
+
+.float-window>header {
+    display: flex;
+    line-height: 24px;
+    height: 24px;
+    text-align: right;
+    margin: 4px 8px;
+    cursor: move;
+    border-bottom: 1px solid var(--color-normal-border);
+}
+
+.float-window>header>span {
+    text-align: center;
+    flex: 1;
+}
+
+.scene-particle ui-prop {
+    --left-width: 60%;
+    margin-bottom: 4px;
+}
+
+:host {
+    display: inline-block;
+    outline: none;
+    font-size: inherit;
+    line-height: inherit;
+    font-family: inherit;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: bottom;
+}
+
+:host>.container svg {
+    font-size: calc(1em + 4px);
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+}
+
+.scene-particle ui-prop {
+    --left-width: 60%;
+    margin-bottom: 4px;
+}
+
+.scene-particle .buttons {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 8px;
+}
+
+.scene-particle .buttons ui-button {
+    padding: 0 8px;
+    width: 56px;
+}
+
+.editor-right-icons {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    pointer-events: none;
+    vertical-align: middle;
+}
+
+.edit-button {
+    width: 30px;
+    height: 30px;
+    margin-right: 5px;
+    border: solid 1px rgba(100, 100, 100, 0.5);   
+    pointer-events: all;     
+    cursor: pointer;  
+    margin-top: 5px;
+}
+
+.edit-button .normal {
+    background-color: rgba(100, 100, 100, 0.5);
+}
+
+.edit-button .hover {
+    background-color: rgba(23, 65, 255, 0.5);
+}
+
+.edit-button-active {
+    background-color: rgba(23, 65, 255, 0.5);
+}
+
+.edit-right-icon {
+    width: 100%;
+    height: 100%;
+}

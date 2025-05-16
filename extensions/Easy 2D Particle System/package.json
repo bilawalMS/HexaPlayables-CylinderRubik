@@ -1,0 +1,85 @@
+{
+  "package_version": 2,
+  "version": "1.0.2",
+  "name": "easy-p2d",
+  "description": "i18n:easy-p2d.description",
+  "main": "./dist/main.js",
+  "dependencies": {
+    "fs-extra": "^10.0.0",
+    "paper": "^0.12.17",
+    "vue": "^3.1.4"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^9.0.5",
+    "@types/node": "^16.0.1",
+    "typescript": "^4.3.4"
+  },
+  "panels": {
+    "default": {
+      "title": "easy-p2d Default Panel",
+      "type": "dockable",
+      "main": "dist/panels/default",
+      "size": {
+        "min-width": 400,
+        "min-height": 300,
+        "width": 1024,
+        "height": 600
+      }
+    }
+  },
+  "contributions": {
+    "menu": [
+      {
+        "path": "i18n:menu.extension/i18n:easy-p2d.easy_p2d",
+        "label": "i18n:easy-p2d.install_sample",
+        "message": "install_sample"
+      }
+    ],
+    "scene": {
+      "script": "./dist/scene.js"
+    },
+    "inspector": {
+      "section": {
+        "node": {
+          "EasyP2D": "./dist/inspector/easy-p2d.js"
+        }
+      }
+    },
+    "messages": {
+      "install_sample": {
+        "methods": [
+          "installSample"
+        ]
+      },
+      "save-pattern": {
+        "methods": [
+          "savePattern"
+        ]
+      },
+      "open-panel": {
+        "methods": [
+          "openPanel"
+        ]
+      },
+      "particle-pause": {
+        "description": "pause particle"
+      },
+      "particle-reset": {
+        "description": "rest particle"
+      }
+    },
+    "asset-db": {
+      "mount": {
+        "path": "./assets/EasyP2D",
+        "readonly": true
+      }
+    }
+  },
+  "author": "Cocos Creator",
+  "editor": ">=3.7.0",
+  "scripts": {
+    "build": "tsc -b",
+    "watch": "tsc -w"
+  },
+  "_storeId": "e3d5029d47fa3126520412edd2127175"
+}

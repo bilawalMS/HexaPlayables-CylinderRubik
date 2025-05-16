@@ -1,0 +1,12 @@
+#include <common/math/number>
+
+vec3 UnpackNormalmap(vec4 packednormal)
+{
+    // This do the trick
+    packednormal.x *= packednormal.w;
+
+    vec3 normal;
+    normal.xy = packednormal.xy * 2. - 1.;
+    normal.z = sqrt(1. - saturate(dot(normal.xy, normal.xy)));
+    return normal;
+}

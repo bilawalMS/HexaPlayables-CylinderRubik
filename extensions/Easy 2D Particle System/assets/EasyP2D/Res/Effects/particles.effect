@@ -1,0 +1,281 @@
+// Copyright (c) 2017-2020 Xiamen Yaji Software Co., Ltd.
+CCEffect %{
+  temporaries:
+    b1: &b1
+      targets:
+      - blend: true
+        blendSrc: src_alpha
+        blendDst: one
+        blendSrcAlpha: src_alpha
+        blendDstAlpha: one
+    b2: &b2
+      targets:
+      - blend: true
+        blendSrc: src_alpha
+        blendDst: one_minus_src_alpha
+        blendSrcAlpha: zero
+        blendDstAlpha: one
+        blendAlphaEq: max
+    b3: &b3
+      targets:
+      - blend: true
+        blendSrc: dst_color
+        blendDst: one
+        blendSrcAlpha: zero
+        blendDstAlpha: dst_alpha
+    b4: &b4
+      targets:
+      - blend: true
+        blendSrc: src_alpha
+        blendDst: one
+        blendSrcAlpha: src_alpha
+        blendDstAlpha: one
+    b5: &b5
+      targets:
+      - blend: true
+        blendSrc: src_alpha
+        blendDst: one_minus_src_alpha
+        blendSrcAlpha: src_alpha
+        blendDstAlpha: one_minus_src_alpha
+    d1: &d1 { depthTest: false, depthWrite: false }
+    r1: &r1 { cullMode: back }
+    p1: &p1
+      alphaThreshold: { value: 0.5 }
+    p2: &p2
+      <<: *p1
+      tintColor:              { value: [0.5, 0.5, 0.5, 0.5], editor: { type: color } }
+    p3: &p3
+      <<: *p1
+      intensity:              { value: 1.0 }
+  techniques:
+  - name: tint-add
+    passes:
+    - vert: sprite-vs:vert
+      frag: tinted-fs:add
+      depthStencilState: *d1
+      blendState: *b1
+      rasterizerState: *r1
+      properties: *p2
+  - name: tint-alpha-blend
+    passes:
+    - vert: sprite-vs:vert
+      frag: tinted-fs:add
+      rasterizerState: *r1
+      depthStencilState: *d1
+      blendState: *b2
+      properties: *p2
+      propertyIndex: 0
+  - name: tint-add-multiply
+    passes:
+    - vert: sprite-vs:vert
+      frag: tinted-fs:multiply
+      rasterizerState: *r1
+      depthStencilState: *d1
+      blendState: *b3
+      properties: *p2
+      propertyIndex: 0
+  - name: multiply
+    passes:
+    - vert: sprite-vs:vert
+      frag: no-tint-fs:multiply
+      rasterizerState: *r1
+      depthStencilState: *d1
+      blendState: *b5
+      properties: *p3
+      propertyIndex: 0
+  - name: add
+    passes:
+    - vert: sprite-vs:vert
+      frag: no-tint-fs:add
+      rasterizerState: *r1
+      depthStencilState: *d1
+      blendState: *b2
+      properties: *p3
+      propertyIndex: 0
+  - name: additive
+    passes:
+    - vert: sprite-vs:vert
+      frag: no-tint-fs:additive
+      rasterizerState: *r1
+      depthStencilState: *d1
+      blendState: *b4
+      properties: *p3
+      propertyIndex: 0
+  - name: add-smooth
+    passes:
+    - vert: sprite-vs:vert
+      frag: no-tint-fs:addSmooth
+      rasterizerState: *r1
+      depthStencilState: *d1
+      blendState: *b1
+      properties: *p1
+      propertyIndex: 0
+  - name: premultiply-blend
+    passes:
+    - vert: sprite-vs:vert
+      frag: no-tint-fs:premultiplied
+      rasterizerState: *r1
+      depthStencilState: *d1
+      blendState: *b2
+      properties: *p1
+      propertyIndex: 0
+}%
+
+CCProgram sprite-vs %{
+  precision highp float;
+  #include <builtin/uniforms/cc-global>
+  #if USE_LOCAL
+    #include <builtin/uniforms/cc-local>
+  #endif
+  #if SAMPLE_FROM_RT
+    #include <common/common-define>
+  #endif
+  in vec3 a_position;
+  in vec2 a_texCoord;
+  in vec4 a_color;  
+  in vec2 a_texCoord1;
+
+  out vec4 color;
+  out vec2 uv0;
+
+  vec4 vert () {
+    vec4 pos = vec4(a_position, 1);
+
+    #if USE_LOCAL
+      pos = cc_matWorld * pos;
+    #endif
+
+    #if USE_PIXEL_ALIGNMENT
+      pos = cc_matView * pos;
+      pos.xyz = floor(pos.xyz);
+      pos = cc_matProj * pos;
+    #else
+      pos = cc_matViewProj * pos;
+    #endif
+
+    uv0 = a_texCoord;
+    #if SAMPLE_FROM_RT
+      CC_HANDLE_RT_SAMPLE_FLIP(uv0);
+    #endif
+    color = a_color;
+
+    return pos;
+  }
+}%
+
+CCProgram tinted-fs %{
+  precision highp float;
+
+  #include <builtin/internal/embedded-alpha>
+  #include <builtin/internal/alpha-test>
+  #include <legacy/output>
+
+  in vec4 color;
+
+  in vec2 uv0;
+  #pragma builtin(local)
+  layout(set = 2, binding = 12) uniform sampler2D cc_spriteTexture;
+  uniform FragConstants {
+    vec4 tintColor;
+  };
+  
+  vec4 add () {
+    vec4 texColor = CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
+    vec4 col = 2.0 * color * tintColor * texColor;
+    #if NO_TRANSPARENT
+      col.a = texColor.r;
+    #endif
+    ALPHA_TEST(col);
+    return CCFragOutput(col);
+  }
+
+  vec4 multiply () {
+    vec4 col;
+    vec4 texColor = CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
+    col.rgb = tintColor.rgb * texColor.rgb * color.rgb * vec3(2.0);
+    #if NO_TRANSPARENT
+      col.a = texColor.r;
+    #endif
+    ALPHA_TEST(col);
+    return CCFragOutput(col);
+  }
+}%
+
+CCProgram no-tint-fs %{
+  precision highp float;
+
+  #include <builtin/internal/embedded-alpha>
+  #include <builtin/internal/alpha-test>
+  #include <legacy/output>
+
+  in vec4 color;
+
+  in vec2 uv0;
+  #pragma builtin(local)
+  layout(set = 2, binding = 12) uniform sampler2D cc_spriteTexture;
+  uniform PConstant {
+    float intensity;
+  };
+
+  vec4 multiply () {
+    vec4 texColor = CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
+    float alpha = texColor.a;
+    #if NO_TRANSPARENT
+      alpha = texColor.r;
+    #endif
+
+    vec3 o = color.rgb * texColor.rgb * intensity;
+    vec4 col = vec4(o, alpha * color.a);
+
+    ALPHA_TEST(col);
+    return CCFragOutput(col);
+  }
+
+  vec4 add () {
+    vec4 texColor = CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
+    vec3 o = color.rgb + texColor.rgb;
+    vec4 col = vec4(o, color.a);
+    #if NO_TRANSPARENT
+      col.a *= texColor.r;
+    #else
+      col.rgb *= texColor.a;
+    #endif
+    ALPHA_TEST(col);
+    return CCFragOutput(col);
+  }
+
+  vec4 additive () {
+    vec4 texColor = CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
+    float alpha = texColor.a;
+    #if NO_TRANSPARENT
+      alpha = texColor.r;
+    #endif
+
+    vec3 o = mix(color.rgb, texColor.rgb, pow(alpha, intensity));
+    vec4 col = vec4(o, alpha * color.a);
+    
+    ALPHA_TEST(col);
+    return CCFragOutput(col);
+  }
+
+  vec4 addSmooth () {
+    vec4 texColor = CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
+    vec4 col = color * texColor;
+    col.rgb *= col.a;
+    #if NO_TRANSPARENT
+      col.rgba *= texColor.r;
+    #endif
+    ALPHA_TEST(col);
+    return CCFragOutput(col);
+  }
+
+  vec4 premultiplied () {
+    vec4 texColor = CCSampleWithAlphaSeparated(cc_spriteTexture, uv0);
+    vec4 col = color * CCSampleWithAlphaSeparated(cc_spriteTexture, uv0) * color.a;
+    #if NO_TRANSPARENT
+      col.rgba *= texColor.r;
+    #endif
+    ALPHA_TEST(col);
+    return CCFragOutput(col);
+  }
+}%

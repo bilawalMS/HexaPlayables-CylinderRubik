@@ -1,0 +1,102 @@
+<div>
+    <style>
+        .float-window {
+            width: 200px;
+            height: 160px;
+            bottom: 10px;
+            right: 10px;
+            opacity: 1;
+            background: var(--color-normal-fill);
+            border-radius: calc(var(--size-normal-radius));
+            color: aliceblue;
+            font-size: 12px;
+        }
+
+        .float-window>header {
+            display: flex;
+            line-height: 24px;
+            height: 24px;
+            text-align: right;
+            margin: 4px 8px;
+            cursor: move;
+            border-bottom: 1px solid var(--color-normal-border);
+        }
+
+        .float-window>header>span {
+            text-align: center;
+            flex: 1;
+        }
+
+        .scene-particle ui-prop {
+            --left-width: 60%;
+            margin-bottom: 4px;
+        }
+
+        :host {
+            display: inline-block;
+            outline: none;
+            font-size: inherit;
+            line-height: inherit;
+            font-family: inherit;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
+        }
+
+        :host>.container svg {
+            font-size: calc(1em + 4px);
+            width: 1em;
+            height: 1em;
+            fill: currentColor;
+            vertical-align: middle;
+            position: relative;
+            top: -1px;
+        }
+    </style>
+    <div class="float-window">
+        <header><span>cc.ParticleSystem</span><ui-icon class="setting" value="setting"></ui-icon></header>
+        <section>
+            <style>
+                .scene-particle ui-prop {
+                    --left-width: 60%;
+                    margin-bottom: 4px;
+                }
+
+                .scene-particle .buttons {
+                    display: flex;
+                    justify-content: space-around;
+                    margin-bottom: 8px;
+                }
+
+                .scene-particle .buttons ui-button {
+                    padding: 0 8px;
+                    width: 56px;
+                }
+            </style>
+            <div class="scene-particle">
+                <div class="buttons">
+                    <ui-button class="toggle">
+                        <ui-icon class="toggle-icon" value="pause"></ui-icon>
+                    </ui-button>
+                    <ui-button class="reset"><ui-icon value="refresh"></ui-icon></ui-button>
+                    <ui-button class="stop"><ui-icon value="stop"></ui-icon></ui-button>
+                </div>
+                <ui-prop>
+                    <ui-label slot="label" value="Playback Speed"></ui-label>
+                    <ui-num-input slot="content" class="speed" tabindex="0" tooltip="Decimals: 6
+        Step: 0.1" value="1" state=""></ui-num-input>
+                </ui-prop>
+                <ui-prop>
+                    <ui-label slot="label" value="Playback Time"></ui-label>
+                    <ui-num-input slot="content" class="time" disabled="" tabindex="-1" tooltip="Decimals: 6
+        Step: 0.1" value="36.38" state=""></ui-num-input>
+                </ui-prop>
+                <ui-prop>
+                    <ui-label slot="label" value="Particle"></ui-label>
+                    <ui-num-input slot="content" class="total" disabled="" tabindex="-1" tooltip="Decimals: 6
+        Step: 0.1" value="50" state=""></ui-num-input>
+                </ui-prop>
+            </div>
+        </section>
+    </div>
+</div>

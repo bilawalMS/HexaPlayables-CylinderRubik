@@ -1,0 +1,40 @@
+<!-- <ui-button @click="onResetClick">Reset</ui-button> -->
+<ui-prop type="dump" id="customMaterial"></ui-prop>
+<ui-prop type="dump" id="timeScale"></ui-prop>
+<ui-prop type="dump" id="system"></ui-prop>
+<div id="app" width="100%" class="container">
+    <div>
+        <canvas id="editorCanvas" class="edit-canvas" ref="editorCanvas" resize>
+        </canvas>
+        <span class="editor-top-left-title">
+            Control+Wheel: Zoom canvas <br>
+            Shift: Snap to grid <br>
+            Right Mouse: Insert/Delete Point <br>
+            Left Mouse: Modify Point<br>
+        </span>
+        <span>
+        </span>
+        <span class="editor-bottom-icons">
+            <img :src="angleImg" alt="" class="edit-bottom-icon">
+            <img :src="velocityImg" alt="" class="edit-bottom-icon">
+        </span>
+        <span class="editor-right-icons">
+            <div class="edit-button" @click="onToCenter" tooltip="Center">                
+                <img :src="icons.centerImg" alt="" class="edit-right-icon"></img>
+            </div>
+            <div :class="{'edit-button': true, 'edit-button-active': toolType == 0}" @click="onDefaultTool" tooltip="DefaultTool">                
+                <img :src="icons.defaultToolImg" alt="" class="edit-right-icon"></img>
+            </div>
+            <div :class="{'edit-button': true, 'edit-button-active': toolType == 1}" @click="onShapeEditor" v-show="isShapeEnable" tooltip="ShapeTool">                
+                <img :src="icons.shapeToolImg" alt="" class="edit-right-icon"></img>
+            </div>
+            <div :class="{'edit-button': true, 'edit-button-active': toolType == 2}" @click="onPathEditor" v-show="isPathEnable" tooltip="PathTool">                
+                <img :src="icons.pathToolImg" alt="" class="edit-right-icon"></img>
+            </div>
+            <div class="edit-button" @click="onClearShape" v-show="toolType != 0" tooltip="Clear">                
+                <img :src="icons.clearImg" alt="" class="edit-right-icon"></img>
+            </div>
+        </span>
+    </div>
+</div>
+</div>
