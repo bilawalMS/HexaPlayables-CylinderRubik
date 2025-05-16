@@ -14,6 +14,8 @@ import {
 } from "cc";
 import { Hex } from "./Hex";
 import { log, PhysicsSystem, geometry, EventTouch } from "cc";
+import { resources, JsonAsset } from "cc";
+
 
 const { ccclass, property } = _decorator;
 
@@ -49,53 +51,104 @@ export class Gameplay extends Component {
   private ray = new geometry.Ray(); // Add this as a class property
 
   start() {
-    this.createGrid();
+    this.loadLevel();
 
     input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
     input.on(Input.EventType.MOUSE_MOVE, this.onMouseMove, this);
     input.on(Input.EventType.MOUSE_UP, this.onMouseUp, this);
   }
 
-  createGrid() {
+  loadLevel() {
+    resources.load("level6", JsonAsset, (err, jsonAsset) => {
+      if (err) {
+        console.error("Failed to load JSON:", err);
+        return;
+      }
+
+      const data = jsonAsset.json as {
+        rows: number;
+        columns: number;
+        grid: number[][];
+      };
+      this.createGridFromJson(data);
+    });
+  }
+
+  createGridFromJson(data: {
+    rows: number;
+    columns: number;
+    grid: number[][];
+  }) {
     if (!this.hexPrefab || !this.container) {
       console.error("Missing hexPrefab or container");
       return;
     }
 
     this.container.removeAllChildren();
+
+    this.rows = data.rows;
+    this.columns = data.columns;
     this.cellNodes = [];
 
     for (let row = 0; row < this.rows; row++) {
       const rowNode = new Node(`Row_${row}`);
       rowNode.setParent(this.container);
-      rowNode.setPosition(new Vec3(0, row * this.rowSpacing, 0));
+      rowNode.setPosition(new Vec3(0, row * this.rowSpacing * -1, 0));
 
       this.cellNodes[row] = [];
 
       for (let col = 0; col < this.columns; col++) {
         const colNode = new Node(`Column_${col}`);
         colNode.setParent(rowNode);
-        colNode.setPosition(new Vec3(col * this.columnSpacing, 0, 0)); // fixed position
-        
-        // Store column nodes
+        colNode.setPosition(new Vec3(col * this.columnSpacing, 0, 0));
+
         this.cellNodes[row][col] = colNode;
+
+        const hexType = data.grid?.[row]?.[col] ?? 1; // safely handle missing values
 
         const hexNode = instantiate(this.hexPrefab);
         hexNode.setParent(colNode);
         hexNode.setPosition(Vec3.ZERO);
         hexNode.setRotation(Quat.IDENTITY);
 
-        // Assign random color/type for testing
         const hexComp = hexNode.getComponent(Hex);
-        const randomType = Math.floor(Math.random() * 5) + 1;
         if (hexComp) {
-          hexComp.changeType(randomType);
+          hexComp.changeType(hexType);
+        } else {
+          console.warn(
+            `Hex component missing on prefab instance at row ${row}, col ${col}`
+          );
         }
-
-        this.cellNodes[row][col] = colNode; // store column node, NOT hex node
       }
     }
+  //   for (let row = 0; row < this.rows; row++) {
+  //   this.arrangeRowAsCylinder(row, 3);  // radius = 5, adjust as needed
+  // }
   }
+
+  arrangeRowAsCylinder(rowIndex: number, radius: number) {
+  const rowArray = this.cellNodes[rowIndex];
+  if (!rowArray || rowArray.length === 0) return;
+
+  const columns = rowArray.length;
+  const angleStep = (2 * Math.PI) / columns;
+
+  for (let col = 0; col < columns; col++) {
+    const angle = col * angleStep;
+
+    // Position on circle (XZ plane)
+    const x = Math.cos(angle) * radius;
+    const z = Math.sin(angle) * radius;
+
+    const colNode = rowArray[col];
+    colNode.setPosition(new Vec3(x, 0, z));
+
+    // Rotate column to face outward (assuming hexes face forward +Z)
+    // Adjust +90 deg if needed depending on your hex orientation
+    const rotationY = -angle * 180 / Math.PI + 90;
+    colNode.setRotation(Quat.fromEuler(new Quat(), 0, rotationY, 0));
+  }
+}
 
   private startDrag(event: EventMouse | EventTouch) {
     const touchPos = event.getLocation();
@@ -182,6 +235,7 @@ export class Gameplay extends Component {
 
     this.updateRowPositions(rowIndex);
     this.deleteColumnsWithAllSameHexType();
+    this.applyGravityAfterShift(rowIndex);
   }
 
   shiftRowLeft(rowIndex: number) {
@@ -202,6 +256,7 @@ export class Gameplay extends Component {
 
     this.updateRowPositions(rowIndex);
     this.deleteColumnsWithAllSameHexType();
+    this.applyGravityAfterShift(rowIndex);
   }
 
   updateRowPositions(rowIndex: number) {
@@ -233,51 +288,86 @@ export class Gameplay extends Component {
   }
 
   private deleteColumnsWithAllSameHexType() {
-    for (let col = 0; col < this.columns; col++) {
-      let firstType: number | null = null;
-      let allMatch = true;
+  for (let col = 0; col < this.columns; col++) {
+    let firstType: number | null = null;
+    let matchingRows: number[] = [];
+    let differentTypeFound = false;
 
-      for (let row = 0; row < this.rows; row++) {
-        const colNode = this.cellNodes[row][col];
-        if (!colNode || colNode.children.length === 0) {
-          allMatch = false; // Empty slot breaks the match
-          break;
-        }
-
-        const hexNode = colNode.children[0];
-        const hexComp = hexNode.getComponent(Hex);
-        if (!hexComp) {
-          allMatch = false;
-          break;
-        }
-
-        if (firstType === null) {
-          firstType = hexComp.type;
-        } else if (hexComp.type !== firstType) {
-          allMatch = false;
-          break;
-        }
+    // Scan top to bottom
+    for (let row = 0; row < this.rows; row++) {
+      const colNode = this.cellNodes[row][col];
+      if (!colNode || colNode.children.length === 0) {
+        // Empty top row - allowed, just continue checking below rows
+        continue;
       }
 
-      if (allMatch && firstType !== null) {
-        console.log(
-          `Deleting column ${col} because all hexes are type ${firstType}`
-        );
+      const hexNode = colNode.children[0];
+      const hexComp = hexNode.getComponent(Hex);
+      if (!hexComp) {
+        differentTypeFound = true;
+        break;
+      }
 
-        for (let row = 0; row < this.rows; row++) {
-          const colNode = this.cellNodes[row][col];
-          if (!colNode) continue;
+      if (firstType === null) {
+        firstType = hexComp.type;
+        matchingRows.push(row);
+      } else if (hexComp.type === firstType) {
+        matchingRows.push(row);
+      } else {
+        // Different type found in top rows → don't delete anything
+        differentTypeFound = true;
+        break;
+      }
+    }
 
-          const hexNode = colNode.children[0];
-          if (hexNode) {
-            hexNode.destroy();
-          }
+    // Only delete if no different type found, and minimum 2 matching rows present
+    if (!differentTypeFound && matchingRows.length >= 2) {
+      console.log(`Deleting column ${col} with type ${firstType}, rows: [${matchingRows.join(', ')}]`);
 
-          colNode.removeAllChildren();
+      for (const row of matchingRows) {
+        const colNode = this.cellNodes[row][col];
+        if (!colNode) continue;
 
-          this.cellNodes[row][col] = null;
+        const hexNode = colNode.children[0];
+        if (hexNode) {
+          hexNode.destroy();
         }
+        colNode.removeAllChildren();
       }
     }
   }
+}
+
+
+  applyGravityAfterShift(rowIndex: number) {
+    for (let col = 0; col < this.columns; col++) {
+    // Start from second-to-last row and go upward
+    for (let row = this.rows - 2; row >= 0; row--) {
+      const currentColNode = this.cellNodes[row][col];
+      if (!currentColNode || currentColNode.children.length === 0) continue;
+
+      const hexNode = currentColNode.children[0];
+      let targetRow = row;
+
+      // Find the lowest empty spot below
+      for (let r = row + 1; r < this.rows; r++) {
+        const belowNode = this.cellNodes[r][col];
+        if (belowNode && belowNode.children.length === 0) {
+          targetRow = r;
+        } else {
+          break; // blocked
+        }
+      }
+
+      if (targetRow !== row) {
+        // Move hexNode to new column
+        const targetColNode = this.cellNodes[targetRow][col];
+        currentColNode.removeChild(hexNode);
+        hexNode.setParent(targetColNode);
+        hexNode.setPosition(Vec3.ZERO);
+        console.log(`Hex fell from row ${row} to ${targetRow} in column ${col}`);
+      }
+    }
+  }
+}
 }
