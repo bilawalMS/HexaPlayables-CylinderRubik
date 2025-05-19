@@ -11,11 +11,11 @@ import {
   Input,
   EventMouse,
   Camera,
+  tween,easing
 } from "cc";
 import { Hex } from "./Hex";
 import { log, PhysicsSystem, geometry, EventTouch } from "cc";
 import { resources, JsonAsset } from "cc";
-
 
 const { ccclass, property } = _decorator;
 
@@ -47,6 +47,8 @@ export class Gameplay extends Component {
 
   private selectedRowIndex: number | null = null;
   private dragStartX: number | null = null;
+  private rowRotationAngle = 0; // in degrees
+  private dragRowNode: Node | null = null;
 
   private ray = new geometry.Ray(); // Add this as a class property
 
@@ -121,34 +123,34 @@ export class Gameplay extends Component {
         }
       }
     }
-  //   for (let row = 0; row < this.rows; row++) {
-  //   this.arrangeRowAsCylinder(row, 3);  // radius = 5, adjust as needed
-  // }
+    for (let row = 0; row < this.rows; row++) {
+      this.arrangeRowAsCylinder(row, 3); // radius = 5, adjust as needed
+    }
   }
 
   arrangeRowAsCylinder(rowIndex: number, radius: number) {
-  const rowArray = this.cellNodes[rowIndex];
-  if (!rowArray || rowArray.length === 0) return;
+    const rowArray = this.cellNodes[rowIndex];
+    if (!rowArray || rowArray.length === 0) return;
 
-  const columns = rowArray.length;
-  const angleStep = (2 * Math.PI) / columns;
+    const columns = rowArray.length;
+    const angleStep = (2 * Math.PI) / columns;
 
-  for (let col = 0; col < columns; col++) {
-    const angle = col * angleStep;
+    for (let col = 0; col < columns; col++) {
+      const angle = col * angleStep;
 
-    // Position on circle (XZ plane)
-    const x = Math.cos(angle) * radius;
-    const z = Math.sin(angle) * radius;
+      // Position on circle (XZ plane)
+      const x = Math.cos(angle) * radius;
+      const z = Math.sin(angle) * radius;
 
-    const colNode = rowArray[col];
-    colNode.setPosition(new Vec3(x, 0, z));
+      const colNode = rowArray[col];
+      colNode.setPosition(new Vec3(x, 0, z));
 
-    // Rotate column to face outward (assuming hexes face forward +Z)
-    // Adjust +90 deg if needed depending on your hex orientation
-    const rotationY = -angle * 180 / Math.PI + 90;
-    colNode.setRotation(Quat.fromEuler(new Quat(), 0, rotationY, 0));
+      // Rotate column to face outward (assuming hexes face forward +Z)
+      // Adjust +90 deg if needed depending on your hex orientation
+      const rotationY = (-angle * 180) / Math.PI + 90;
+      colNode.setRotation(Quat.fromEuler(new Quat(), 0, rotationY, 0));
+    }
   }
-}
 
   private startDrag(event: EventMouse | EventTouch) {
     const touchPos = event.getLocation();
@@ -193,29 +195,59 @@ export class Gameplay extends Component {
     const currentX = event.getLocationX();
     const deltaX = currentX - this.dragStartX;
 
-    // Threshold to detect significant drag
-    const threshold = 10;
+    const anglePerPixel = 0.3; // adjust sensitivity
+    const angleDelta = deltaX * anglePerPixel;
 
-    if (Math.abs(deltaX) >= threshold) {
-      if (deltaX > 0) {
-        this.shiftRowRight(this.selectedRowIndex);
-        log(`Shift row ${this.selectedRowIndex} right`);
-      } else {
-        this.shiftRowLeft(this.selectedRowIndex);
-        log(`Shift row ${this.selectedRowIndex} left`);
-      }
+    this.rowRotationAngle += angleDelta;
 
-      // Reset drag start to current position to allow continuous drag shifts
-      this.dragStartX = currentX;
+    this.dragRowNode = this.container.children[this.selectedRowIndex];
+    if (this.dragRowNode) {
+      const rotation = new Quat();
+      Quat.fromEuler(rotation, 0, this.rowRotationAngle, 0);
+      this.dragRowNode.setRotation(rotation);
     }
+
+    this.dragStartX = currentX;
   }
 
   onMouseUp(event: EventMouse | EventTouch) {
+    if (this.selectedRowIndex === null || this.dragRowNode === null) return;
+
+    const columns = this.columns;
+    const anglePerColumn = 360 / columns;
+
+    const snappedSteps = Math.round(this.rowRotationAngle / anglePerColumn);
+    this.rowRotationAngle = 0;
+
+    if (this.dragRowNode) {
+      const rotation = new Quat();
+      Quat.fromEuler(rotation, 0, 0, 0); // Reset to 0 Y-rotation
+      this.dragRowNode.setRotation(rotation);
+    }
+
+    // Reset rotation visually
+    this.rowRotationAngle = 0;
+    this.dragRowNode.angle = 0;
+
+    tween(this.dragRowNode)
+      .to(0.2, { angle: 0 }, { easing: "cubicOut" })
+      .start();
+
+    // Apply actual logic shift
+    for (let i = 0; i < Math.abs(snappedSteps); i++) {
+      if (snappedSteps > 0) {
+        this.shiftRowRight(this.selectedRowIndex);
+      } else {
+        this.shiftRowLeft(this.selectedRowIndex);
+      }
+    }
+
     this.selectedRowIndex = null;
     this.dragStartX = null;
+    this.dragRowNode = null;
   }
 
-  shiftRowRight(rowIndex: number) {
+  shiftRowLeft(rowIndex: number) {
     const rowColumns = this.cellNodes[rowIndex];
     if (!rowColumns || rowColumns.length === 0) return;
 
@@ -235,10 +267,10 @@ export class Gameplay extends Component {
 
     this.updateRowPositions(rowIndex);
     this.deleteColumnsWithAllSameHexType();
-    this.applyGravityAfterShift(rowIndex);
+    this.applyGravityWithAnimation()
   }
 
-  shiftRowLeft(rowIndex: number) {
+  shiftRowRight(rowIndex: number) {
     const rowColumns = this.cellNodes[rowIndex];
     if (!rowColumns || rowColumns.length === 0) return;
 
@@ -256,7 +288,7 @@ export class Gameplay extends Component {
 
     this.updateRowPositions(rowIndex);
     this.deleteColumnsWithAllSameHexType();
-    this.applyGravityAfterShift(rowIndex);
+    this.applyGravityWithAnimation()
   }
 
   updateRowPositions(rowIndex: number) {
@@ -286,20 +318,17 @@ export class Gameplay extends Component {
       console.log(gridStr);
     }
   }
+private deleteColumnsWithAllSameHexType() {
+  let globalDelay = 0; // for staggering across columns
 
-  private deleteColumnsWithAllSameHexType() {
   for (let col = 0; col < this.columns; col++) {
     let firstType: number | null = null;
     let matchingRows: number[] = [];
     let differentTypeFound = false;
 
-    // Scan top to bottom
     for (let row = 0; row < this.rows; row++) {
       const colNode = this.cellNodes[row][col];
-      if (!colNode || colNode.children.length === 0) {
-        // Empty top row - allowed, just continue checking below rows
-        continue;
-      }
+      if (!colNode || colNode.children.length === 0) continue;
 
       const hexNode = colNode.children[0];
       const hexComp = hexNode.getComponent(Hex);
@@ -314,60 +343,95 @@ export class Gameplay extends Component {
       } else if (hexComp.type === firstType) {
         matchingRows.push(row);
       } else {
-        // Different type found in top rows → don't delete anything
         differentTypeFound = true;
         break;
       }
     }
 
-    // Only delete if no different type found, and minimum 2 matching rows present
     if (!differentTypeFound && matchingRows.length >= 2) {
       console.log(`Deleting column ${col} with type ${firstType}, rows: [${matchingRows.join(', ')}]`);
 
-      for (const row of matchingRows) {
+      let delayTime = globalDelay; // start of this column’s stagger
+
+      for (let i = 0; i < matchingRows.length; i++) {
+        const row = matchingRows[i];
         const colNode = this.cellNodes[row][col];
-        if (!colNode) continue;
+        if (!colNode || colNode.children.length === 0) continue;
 
         const hexNode = colNode.children[0];
-        if (hexNode) {
-          hexNode.destroy();
-        }
-        colNode.removeAllChildren();
+
+        tween(hexNode)
+          .delay(delayTime)
+          .call(() => {
+          })
+          .to(0.2, { scale: new Vec3(1.1, 1.1, 1.1) }, { easing: 'quadOut' }) // Expand
+          .to(0.3, { eulerAngles: new Vec3(0, 180, 0) }, { easing: 'quadIn' }) // Rotate
+          .to(0.3, { scale: new Vec3(0, 0, 0) }, { easing: 'quadIn' }) // Shrink
+          .call(() => {
+            hexNode.destroy();
+            colNode.removeAllChildren();
+          })
+          .start();
+
+        delayTime += 0.08; // stagger next tile
       }
+
+      globalDelay += matchingRows.length * 0.05 + 0.2; // buffer before next column
     }
   }
 }
 
-
-  applyGravityAfterShift(rowIndex: number) {
-    for (let col = 0; col < this.columns; col++) {
-    // Start from second-to-last row and go upward
+applyGravityWithAnimation() {
+  for (let col = 0; col < this.columns; col++) {
     for (let row = this.rows - 2; row >= 0; row--) {
-      const currentColNode = this.cellNodes[row][col];
-      if (!currentColNode || currentColNode.children.length === 0) continue;
+      const currentNode = this.cellNodes[row][col];
+      if (!currentNode || currentNode.children.length === 0) continue;
 
-      const hexNode = currentColNode.children[0];
+      const hexNode = currentNode.children[0];
+      if (!hexNode) continue;
+
+      // Find the lowest empty row below
       let targetRow = row;
-
-      // Find the lowest empty spot below
       for (let r = row + 1; r < this.rows; r++) {
         const belowNode = this.cellNodes[r][col];
         if (belowNode && belowNode.children.length === 0) {
           targetRow = r;
         } else {
-          break; // blocked
+          break;
         }
       }
 
       if (targetRow !== row) {
-        // Move hexNode to new column
-        const targetColNode = this.cellNodes[targetRow][col];
-        currentColNode.removeChild(hexNode);
-        hexNode.setParent(targetColNode);
-        hexNode.setPosition(Vec3.ZERO);
-        console.log(`Hex fell from row ${row} to ${targetRow} in column ${col}`);
+        const targetNode = this.cellNodes[targetRow][col];
+
+        // Remove from old parent
+        currentNode.removeChild(hexNode);
+
+        // Reparent to new node (logical)
+        hexNode.setParent(this.container); // temporarily reparent for global animation
+
+        // Get world position of source and destination
+        const fromWorldPos = currentNode.getWorldPosition();
+        const toWorldPos = targetNode.getWorldPosition();
+
+        // Place hex at world position of old cell
+        hexNode.setWorldPosition(fromWorldPos);
+
+        // Animate falling to new position
+        tween(hexNode)
+          .to(0.3 + (targetRow - row) * 0.05, { worldPosition: toWorldPos }, { easing: "quadIn" })
+          .call(() => {
+            // Final reparent to proper target node
+            hexNode.setParent(targetNode);
+            hexNode.setPosition(Vec3.ZERO);
+            
+          })
+          .start();
       }
     }
   }
 }
+
+
+
 }
